@@ -11,7 +11,7 @@ function checkanddeletebackup {
     } elseif ($count -ge 2) {
         Write-Host 'There are' $count 'backups. Checking for sufficient free space to create backup number' ($count+1)
         checkenoughspace
-        if((checkenoughspace) -eq $true) {
+        if((checkenoughspace) -eq $true -And (checkhowmanybackup) -eq $true) {
             createandcopy
         } elseif ((checkenoughspace) -ne $true)  {
             deleteoldestbackup
