@@ -5,5 +5,8 @@ function checkbackups {
     } elseif ($count -ge 2) {
         Write-Host 'There are' $count 'backups.'
         return $true
+    } else {
+        Write-Output 'The script has encountered error(s). Please check code.'
+        exit
     }
 }
