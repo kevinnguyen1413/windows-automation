@@ -72,3 +72,5 @@ function createandcopy {
     robocopy $SourceDrive "$newdir" /E /A-:SHA /XA:H /XD "$newdir"
     Write-Output 'Backup created at'$newdir
 }
+
+main
