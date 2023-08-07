@@ -14,11 +14,19 @@ Write-Host 'Used Space at Source Drive:'$SourceUsedSpace
 Write-Host 'Free Space at Destination Drive:'$DestFreeSpace
 
 function main {
-    if ((checkenoughspace) -eq $false -And (checkbackups -eq $true)) {
+    $enoughSpace = checkenoughspace
+    $backupsExist = checkbackups
+    if (($enoughSpace) -eq $false -And ($backupsExist -eq $true)) {
         Write-Host "Not enough space!"
-        deleteoldestbackup
+        $deletedBackup = deleteoldestbackup
+        if (($deletedBackup) -eq $true -And (checkenoughspace -eq $true)) {
         createandcopy
-    } elseif ((checkenoughspace) -eq $true -And (checkbackups -eq $true)) {
+        }
+        else {
+            Write-Host 'There is only 1 backup but there is not enough space to create a 2nd backup. Please check destination drive.'
+            exit
+        }
+    } elseif (($enoughSpace) -eq $true -And ($backupsExist -eq $true)) {
         Write-Host "Enough space"
         createandcopy
     } else {
@@ -39,11 +47,8 @@ function checkenoughspace {
 }
 
 function checkbackups {
-    if ($count -le 1) {
-        Write-Host $count 'backup found.'
-        return $true
-    } elseif ($count -gt 1) {
-        Write-Host 'There are' $count 'backups found'
+    if ($count -ge 0) {
+        Write-Host 'Backup(s) at destination:' $count
         return $true
     } else {
         Write-Host 'The script has encountered error(s). Please check code.'
@@ -57,8 +62,13 @@ function deleteoldestbackup {
         return $false
     }
 
-    Write-Host 'There are' $count 'backups but not enough drive capacity. Deletion will begin in 5 seconds.'
-    Start-Sleep -Seconds 5    
+    Write-Host 'There are' $count 'backups but not enough drive capacity.'
+    Write-Host 'Keeping latest backup:'
+    $allFolders | Sort-Object CreationTime -Descending | Select-Object -First 1 | Write-Host
+    Write-Host 'Deletion targets are:' 
+    $allFolders | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Write-Host
+    Write-Host 'Deletion will begin in 5 seconds.'
+    Start-Sleep -Seconds 10
     $allFolders | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Remove-Item -Recurse -Force
     Write-Host 'Deletion completed.'
     return $true
