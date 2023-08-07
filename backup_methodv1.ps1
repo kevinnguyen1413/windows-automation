@@ -71,11 +71,11 @@ function deleteoldestbackup {
 
 function createandcopy {
     Write-Output 'Creating new backup.'
-    $folderName = (Get-Date).tostring("yyyy-MM-dd-hh-mm-ss")
-    New-Item -ItemType Directory -Path $DestDrive -Name $folderName
-    $newdir = $DestDrive + $folderName
-    robocopy $SourceDrive "$newdir" /E /A-:SHA /XA:H /XD "$newdir"
-    Write-Output 'Backup created at'$newdir
+    $folderName = (Get-Date).ToString("yyyy-MM-dd-HH-mm-ss")
+    $newdir = Join-Path $DestDrive $folderName
+    New-Item -ItemType Directory -Path $newdir
+    robocopy "$SourceDrive" "$newdir" /E /A-:SHA /XA:H /XD "$newdir"
+    Write-Output 'Backup created at' $newdir
 }
 
 main
