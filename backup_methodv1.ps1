@@ -15,8 +15,8 @@ Write-Host 'Free Space at Destination Drive:'$DestFreeSpace
 
 function main {
     checkenoughspace
-    checkhowmanybackup
-    if ((checkenoughspace) -eq $false -And (checkhowmanybackup -eq $true)) {
+    checkbackups
+    if ((checkenoughspace) -eq $false -And (checkbackups -eq $true)) {
         deleteoldestbackup
         checkenoughspace
         if ((deleteoldestbackup) -eq $true -And (checkenoughspace -eq $true)) {
@@ -25,7 +25,7 @@ function main {
             Write-Output 'The script has encountered error(s). Please check code.'
             exit
         }
-    } elseif ((checkenoughspace) -eq $true -And (checkhowmanybackup -eq $true)) {
+    } elseif ((checkenoughspace) -eq $true -And (checkbackups -eq $true)) {
         createandcopy
     } else {
         Write-Output 'The script has encountered error(s). Please check code.'
