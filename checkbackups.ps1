@@ -3,10 +3,10 @@ function checkbackups {
         Write-Host $count 'backup found.'
         return $true
     } elseif ($count -gt 1) {
-        Write-Host 'There are' $count 'backups.'
+        Write-Host 'There are' $count 'backups found'
         return $true
     } else {
-        Write-Output 'The script has encountered error(s). Please check code.'
+        Write-Host 'The script has encountered error(s). Please check code.'
         exit
     }
 }

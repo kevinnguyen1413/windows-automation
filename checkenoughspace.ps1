@@ -1,9 +1,9 @@
 function checkenoughspace {
     if(($DestFreeSpace*0.9) -gt $SourceUsedSpace) {
-        Write-Output "Enough space"
         return $true
-    } else {
-        Write-Output "Not enough space!"
+    } elseif (($DestFreeSpace*0.9) -lt $SourceUsedSpace) {
         return $false
+    } else {
+        Write-Host 'True/False not working.'
     }
 }

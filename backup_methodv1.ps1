@@ -14,32 +14,27 @@ Write-Host 'Used Space at Source Drive:'$SourceUsedSpace
 Write-Host 'Free Space at Destination Drive:'$DestFreeSpace
 
 function main {
-    checkenoughspace
-    checkbackups
     if ((checkenoughspace) -eq $false -And (checkbackups -eq $true)) {
+        Write-Host "Not enough space!"
         deleteoldestbackup
-        checkenoughspace
-        if ((deleteoldestbackup) -eq $true -And (checkenoughspace -eq $true)) {
-            createandcopy
-        } else {
-            Write-Output 'The script has encountered error(s). Please check code.'
-            exit
-        }
+        createandcopy
     } elseif ((checkenoughspace) -eq $true -And (checkbackups -eq $true)) {
+        Write-Host "Enough space"
         createandcopy
     } else {
-        Write-Output 'The script has encountered error(s). Please check code.'
+        Write-Host 'The script has encountered error(s). Please check code.'
         exit
     }
 }
 
+
 function checkenoughspace {
     if(($DestFreeSpace*0.9) -gt $SourceUsedSpace) {
-        Write-Output "Enough space"
         return $true
-    } else {
-        Write-Output "Not enough space!"
+    } elseif (($DestFreeSpace*0.9) -lt $SourceUsedSpace) {
         return $false
+    } else {
+        Write-Host 'True/False not working.'
     }
 }
 
@@ -48,34 +43,34 @@ function checkbackups {
         Write-Host $count 'backup found.'
         return $true
     } elseif ($count -gt 1) {
-        Write-Host 'There are' $count 'backups.'
+        Write-Host 'There are' $count 'backups found'
         return $true
     } else {
-        Write-Output 'The script has encountered error(s). Please check code.'
+        Write-Host 'The script has encountered error(s). Please check code.'
         exit
     }
 }
 
 function deleteoldestbackup {
     if ($count -le 1) {
-        Write-Output 'There is $count backup. No need to delete.'
+        Write-Host 'There is' $count 'backup. No need to delete.'
         return $false
     }
 
-    Write-Output 'There are $count backups but not enough drive capacity. Deletion will begin in 5 seconds.'
+    Write-Host 'There are' $count 'backups but not enough drive capacity. Deletion will begin in 5 seconds.'
     Start-Sleep -Seconds 5    
     $allFolders | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Remove-Item -Recurse -Force
-    Write-Output 'Deletion completed.'
+    Write-Host 'Deletion completed.'
     return $true
 }
 
 function createandcopy {
-    Write-Output 'Creating new backup.'
+    Write-Host 'Creating new backup.'
     $folderName = (Get-Date).ToString("yyyy-MM-dd-HH-mm-ss")
     $newdir = Join-Path $DestDrive $folderName
     New-Item -ItemType Directory -Path $newdir
     robocopy "$SourceDrive" "$newdir" /E /A-:SHA /XA:H /XD "$newdir"
-    Write-Output 'Backup created at' $newdir
+    Write-Host 'Backup created at' $newdir
 }
 
 main
