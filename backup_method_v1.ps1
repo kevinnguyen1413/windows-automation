@@ -13,6 +13,9 @@ Write-Host 'Free Space at Source Drive:'$SourceFreeSpace
 Write-Host 'Used Space at Source Drive:'$SourceUsedSpace
 Write-Host 'Free Space at Destination Drive:'$DestFreeSpace
 
+#The main function will perform the folllowing steps:
+#1. If there is not enough space, deletion of oldest backup(s) will start. Else, if there is enough space, create a new backup.
+#2. If deletion of oldest backup(s) was successful and there is enough space, create a new back up.
 function main {
     $enoughSpace = checkenoughspace
     $backupsExist = checkbackups
@@ -36,6 +39,8 @@ function main {
 }
 
 
+#Function to check if there is enough space in destination drive.
+#Free space in destination drive is multiplied by 0.9 to compensate for missing capacity due to calculation of storage capacity.
 function checkenoughspace {
     if(($DestFreeSpace*0.9) -gt $SourceUsedSpace) {
         return $true
@@ -46,6 +51,7 @@ function checkenoughspace {
     }
 }
 
+#Function to check for the number of backup currently in the drive. Only check for 0 or more backup(s).
 function checkbackups {
     if ($count -ge 0) {
         Write-Host 'Backup(s) at destination:' $count
@@ -56,6 +62,9 @@ function checkbackups {
     }
 }
 
+#Function to delete backup. First the function will check if there are 1 or fewer backup. If so -> skip deletion.
+#If there is not enough capacity in the drive, the function will display the backup that will be kept and the backup(s) that will be deleted.
+#You have 10 seconds before the deletion starts.
 function deleteoldestbackup {
     if ($count -le 1) {
         Write-Host 'There is' $count 'backup. No need to delete.'
@@ -67,13 +76,15 @@ function deleteoldestbackup {
     $allFolders | Sort-Object CreationTime -Descending | Select-Object -First 1 | Write-Host
     Write-Host 'Deletion targets are:' 
     $allFolders | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Write-Host
-    Write-Host 'Deletion will begin in 5 seconds.'
+    Write-Host 'Deletion will begin in 10 seconds.'
     Start-Sleep -Seconds 10
     $allFolders | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Remove-Item -Recurse -Force
     Write-Host 'Deletion completed.'
     return $true
 }
 
+#Function to create a new drive with yyyy-mm-dd format for name and will copy all files from source drive to destination drive.
+#After the function finishes copying, location of newly created backup will be displayed.
 function createandcopy {
     Write-Host 'Creating new backup.'
     $folderName = (Get-Date).ToString("yyyy-MM-dd")
