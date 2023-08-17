@@ -87,11 +87,11 @@ function deleteoldestbackup {
 #After the function finishes copying, location of newly created backup will be displayed.
 function createandcopy {
     Write-Host 'Creating new backup.'
-    $folderName = (Get-Date).ToString("yyyy-MM-dd")
-    $newdir = Join-Path $DestDrive $folderName
-    New-Item -ItemType Directory -Path $newdir
-    robocopy "$SourceDrive" "$newdir" /E /A-:SHA /XA:H /XD "$newdir"
-    Write-Host 'Backup created at' $newdir
+    $backupName = (Get-Date).ToString("yyyy-MM-dd")
+    $newBackup = Join-Path $DestDrive $backupName
+    New-Item -ItemType Directory -Path $newBackup
+    robocopy "$SourceDrive" "$newBackup" /E /A-:SHA /XA:H /XD "$newBackup"
+    Write-Host 'Backup created at' $newBackup
 }
 
 main
