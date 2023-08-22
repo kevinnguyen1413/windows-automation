@@ -1,13 +1,17 @@
 $SourceDriveLetter = Read-Host -Prompt 'Input your source drive without colon and backslash'
 $DestDriveLetter = Read-Host -Prompt 'Input your destination drive without colon and backslash'
+
 $SourceDrive = $SourceDriveLetter + ':\'
 $DestDrive = $DestDriveLetter + ':\'
+
 $SourceCap = $(Get-WmiObject -Class win32_logicaldisk | Where-Object -Property Name -eq ${SourceDriveLetter}:).Size
 $SourceFreeSpace = $(Get-WmiObject -Class win32_logicaldisk | Where-Object -Property Name -eq ${SourceDriveLetter}:).FreeSpace
 $SourceUsedSpace = $SourceCap - $SourceFreeSpace
 $DestFreeSpace = $(Get-WmiObject -Class win32_logicaldisk | Where-Object -Property Name -eq ${DestDriveLetter}:).FreeSpace
+
 $count = (Get-ChildItem -Path $DestDrive -Directory | Measure-Object).Count
 $allFolders = Get-ChildItem -Path $DestDrive -Directory
+
 Write-Host 'Capacity at Source Drive:'$SourceCap
 Write-Host 'Free Space at Source Drive:'$SourceFreeSpace
 Write-Host 'Used Space at Source Drive:'$SourceUsedSpace
